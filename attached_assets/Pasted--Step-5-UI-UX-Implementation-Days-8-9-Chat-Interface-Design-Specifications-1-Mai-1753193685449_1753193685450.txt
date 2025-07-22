@@ -1,0 +1,133 @@
+### Step 5: UI/UX Implementation (Days 8-9)
+
+#### Chat Interface Design Specifications
+
+**1. Main Dialogue Area**
+- Clean, centered chat interface inspired by Claude.ai, ChatGPT, and Gemini
+- PromptELT logo at the top center (replacing typical AI assistant logos)
+- Message bubbles with clear user/assistant distinction
+- Code highlighting for SQL queries and results (similar to Claude's code blocks)
+- Smooth auto-scroll to latest messages
+- Loading indicators with animated dots while processing
+
+**2. Database Icon Integration in Dialogue Box**
+```
+Prompt Input Area Design:
+┌─────────────────────────────────────────────────────────┐
+│ [@snowflake-prod] [@mssql-dev] [@salesforce]           │
+│                                                         │
+│ Type your database query here...                       │
+│                                                         │
+│ [📎] [➤ Send]                                          │
+└─────────────────────────────────────────────────────────┘
+
+Where:
+- Database icons appear as interactive chips/tags
+- Each icon shows: [icon + alias + status dot]
+- Green dot (●) = online, Red dot (●) = offline
+- Click to select/deselect databases for query
+- Icons loaded from assets/icons/ folder
+```
+
+**3. Database Status Indicators**
+- Small database icons with status dots in the prompt area
+- Icons to implement:
+  - `assets/icons/mssql.png` - SQL Server icon
+  - `assets/icons/salesforce.png` - Salesforce icon  
+  - `assets/icons/snowflake.png` - Snowflake icon
+  - `assets/icons/prompt_ELT_logo.png` - Main app logo
+- Hoverable tooltips showing:
+  - Connection status (Online/Offline)
+  - Last sync time
+  - Database alias and type
+
+**4. Dialogue Features (Inspired by Leading AI Interfaces)**
+
+**From Claude.ai:**
+- Clean code syntax highlighting with language detection
+- Copy button on code blocks
+- Collapsible sections for long results
+- Markdown rendering for formatted responses
+
+**From ChatGPT:**
+- Conversation threading and history
+- Edit and regenerate messages
+- Stop generation button during responses
+- Model/connection indicator at top
+
+**From Gemini:**
+- Multi-modal result display (tables, charts, raw data)
+- Quick action buttons below responses
+- Related prompts suggestions
+- Draft variations for complex queries
+
+**5. Interactive Elements**
+
+**Database Selection in Prompt:**
+- Type `@` to show database selector dropdown
+- Auto-complete database aliases
+- Visual indicator of selected databases
+- Example: "@snowflake-prod show me all customer tables"
+
+**Result Display:**
+- Tabbed view for multi-database results
+- Syntax-highlighted SQL that was generated
+- Formatted table view for query results
+- Export options (CSV, JSON, SQL)
+- Result caching indicator
+
+**6. Layout Structure**
+```
+┌─────────────────────────────────────────────────────────┐
+│  [☰]            PromptELT Logo              [Light/Dark]│
+├─────────────────────────────────────────────────────────┤
+│                                                          │
+│                   Chat Messages Area                     │
+│                                                          │
+│  User: @snowflake Compare sales tables...               │
+│  ┌────────────────────────────────────┐                │
+│  │ Generated SQL:                      │                │
+│  │ ```sql                              │                │
+│  │ SELECT * FROM sales.customers       │                │
+│  │ ```                                 │                │
+│  └────────────────────────────────────┘                │
+│                                                          │
+│  Results: [Table View] [Raw] [Export]                   │
+│  ┌────────────────────────────────────┐                │
+│  │ customer_id │ name    │ revenue    │                │
+│  │ 1          │ Acme    │ $1.2M      │                │
+│  └────────────────────────────────────┘                │
+│                                                          │
+├─────────────────────────────────────────────────────────┤
+│ [@mssql ●] [@snowflake ●] [@salesforce ●]              │
+│ ┌────────────────────────────────────┐                 │
+│ │ Ask about your databases...        │ [📎] [Send]     │
+│ └────────────────────────────────────┘                 │
+└─────────────────────────────────────────────────────────┘
+```
+
+**7. Implementation Requirements**
+
+- Use React with TypeScript for type safety
+- Implement syntax highlighting with Prism.js or similar
+- Use Tailwind CSS for styling with custom animations
+- WebSocket connection for real-time status updates
+- Virtualized scrolling for performance with long conversations
+- Responsive design that works on mobile and desktop
+- Keyboard shortcuts (Cmd/Ctrl + Enter to send, etc.)
+- Local storage for conversation history
+- Theme persistence (light/dark mode)
+
+**8. Interaction Flow Example**
+```
+1. User clicks @snowflake icon in prompt area
+2. Icon highlights with blue border
+3. User types: "show me customer data"
+4. System shows: 
+   - Generated SQL with syntax highlighting
+   - Executing indicator
+   - Results in formatted table
+   - Option to compare with other databases
+5. User can click @mssql to add it to comparison
+6. System runs parallel queries and shows side-by-side results
+```
