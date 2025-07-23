@@ -20,15 +20,15 @@ export function Logo({ size = "md", className = "" }: LogoProps) {
     }
   };
 
-  // Use dark logo for dark theme (dark webapp background)
-  // Use light logo for light theme (light webapp background)
-  const logoSrc = theme === "dark" ? promptEltDarkLogo : promptEltLightLogo;
+  // Use light logo for dark theme (light logo on dark webapp background)
+  // Use dark logo for light theme (dark logo on light webapp background)
+  const logoSrc = theme === "dark" ? promptEltLightLogo : promptEltDarkLogo;
 
   return (
     <img 
       src={logoSrc} 
       alt="PromptELT" 
-      className={`${getSizeClasses()} ${className} mix-blend-multiply dark:mix-blend-screen`}
+      className={`${getSizeClasses()} ${className}`}
     />
   );
 }

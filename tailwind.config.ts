@@ -51,6 +51,12 @@ export default {
           "4": "var(--chart-4)",
           "5": "var(--chart-5)",
         },
+        promptelt: {
+          "50": "var(--promptelt-50)",
+          "500": "var(--promptelt-500)",
+          "600": "var(--promptelt-600)",
+          "700": "var(--promptelt-700)",
+        },
         sidebar: {
           DEFAULT: "var(--sidebar-background)",
           foreground: "var(--sidebar-foreground)",

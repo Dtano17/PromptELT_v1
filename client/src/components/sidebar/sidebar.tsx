@@ -40,7 +40,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
           </Button>
         </div>
         {isOpen && (
-          <Button className="w-full bg-promptelt-500 text-white rounded-lg px-3 py-2 text-sm font-medium hover:bg-promptelt-600 transition-colors flex items-center justify-center space-x-2">
+          <Button className="w-full bg-promptelt-500 hover:bg-promptelt-600 text-white rounded-lg px-3 py-2 text-sm font-medium transition-colors flex items-center justify-center space-x-2 shadow-sm">
             <Plus size={16} />
             <span>New Pipeline Chat</span>
           </Button>
