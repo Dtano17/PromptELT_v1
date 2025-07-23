@@ -3,6 +3,7 @@ import { Plus } from "lucide-react";
 import { DatabaseConnections } from "./database-connections";
 import { QueryHistory } from "./query-history";
 import { Pipelines } from "./pipelines";
+import promptEltLogo from "@assets/image_1753195611158.png";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -11,18 +12,13 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen }: SidebarProps) {
   return (
-    <div className={`w-64 bg-white border-r border-gray-200 flex flex-col ${isOpen ? 'block' : 'hidden lg:flex'}`}>
+    <div className={`w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col ${isOpen ? 'block' : 'hidden lg:flex'}`}>
       {/* Sidebar Header */}
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center space-x-2">
           {/* PromptELT Logo */}
-          <div className="w-8 h-8 bg-promptelt-500 rounded-lg flex items-center justify-center">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-              <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
-              <path d="M20 4h2v16h-2z"/>
-            </svg>
-          </div>
-          <span className="font-semibold text-gray-900">PromptELT</span>
+          <img src={promptEltLogo} alt="PromptELT" className="w-8 h-8" />
+          <span className="font-semibold text-gray-900 dark:text-white">PromptELT</span>
         </div>
         <Button className="w-full mt-3 bg-promptelt-500 text-white rounded-lg px-3 py-2 text-sm font-medium hover:bg-promptelt-600 transition-colors flex items-center justify-center space-x-2">
           <Plus size={16} />
@@ -38,10 +34,10 @@ export function Sidebar({ isOpen }: SidebarProps) {
       </nav>
 
       {/* Sidebar Footer */}
-      <div className="p-4 border-t border-gray-200">
-        <div className="flex items-center justify-between text-xs text-gray-500">
+      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
           <span>Free plan</span>
-          <button className="text-promptelt-600 hover:text-promptelt-700">Upgrade</button>
+          <button className="text-promptelt-600 hover:text-promptelt-700 dark:text-promptelt-400 dark:hover:text-promptelt-300">Upgrade</button>
         </div>
       </div>
     </div>

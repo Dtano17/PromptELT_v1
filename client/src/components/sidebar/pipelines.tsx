@@ -62,7 +62,7 @@ export function Pipelines() {
 
   return (
     <div>
-      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+      <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
         Pipelines
       </h3>
       <div className="space-y-1">
@@ -73,11 +73,11 @@ export function Pipelines() {
           return (
             <div key={pipeline.id} className="pipeline-node">
               <div 
-                className="p-2 rounded cursor-pointer flex items-center space-x-2"
+                className="p-2 rounded cursor-pointer flex items-center space-x-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                 onClick={() => togglePipeline(pipeline.id)}
               >
                 {children.length > 0 && (
-                  <button className="p-0 h-auto">
+                  <button className="p-0 h-auto text-gray-500 dark:text-gray-400">
                     {isExpanded ? (
                       <ChevronDown size={12} />
                     ) : (
@@ -85,7 +85,7 @@ export function Pipelines() {
                     )}
                   </button>
                 )}
-                <div className="flex items-center space-x-2 text-sm text-gray-700 flex-1">
+                <div className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300 flex-1">
                   <svg width="12" height="12" fill="currentColor" className={getStatusColor(pipeline.status)}>
                     <circle cx="6" cy="6" r="6"/>
                   </svg>
@@ -98,7 +98,7 @@ export function Pipelines() {
                   {children.map((child) => (
                     <div 
                       key={child.id}
-                      className="text-xs text-gray-500 hover:text-gray-700 cursor-pointer p-1 rounded hover:bg-gray-50"
+                      className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer p-1 rounded hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <div className="flex items-center space-x-2">
                         <svg width="8" height="8" fill="currentColor" className={getStatusColor(child.status)}>
@@ -114,7 +114,7 @@ export function Pipelines() {
           );
         })}
         {rootPipelines.length === 0 && (
-          <div className="text-sm text-gray-500 p-2">No pipelines yet</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400 p-2">No pipelines yet</div>
         )}
       </div>
     </div>

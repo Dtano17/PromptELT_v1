@@ -27,23 +27,23 @@ export function QueryHistory() {
 
   return (
     <div>
-      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+      <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
         Query History
       </h3>
       <div className="space-y-1">
         {conversations.map((conversation) => (
           <div
             key={conversation.id}
-            className="p-2 rounded hover:bg-gray-100 cursor-pointer text-sm text-gray-700"
+            className="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm text-gray-700 dark:text-gray-300"
           >
             <div className="truncate">{conversation.title}</div>
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-gray-500 dark:text-gray-400">
               {conversation.createdAt ? formatDistanceToNow(new Date(conversation.createdAt), { addSuffix: true }) : "Unknown"}
             </div>
           </div>
         ))}
         {conversations.length === 0 && (
-          <div className="text-sm text-gray-500 p-2">No conversations yet</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400 p-2">No conversations yet</div>
         )}
       </div>
     </div>

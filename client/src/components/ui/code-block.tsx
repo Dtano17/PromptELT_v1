@@ -21,10 +21,10 @@ export function CodeBlock({ code, language }: CodeBlockProps) {
   };
 
   return (
-    <div className="code-block p-4 relative">
+    <div className="code-block bg-slate-900 dark:bg-slate-800 text-slate-200 dark:text-slate-100 p-4 relative rounded-lg">
       <Button
         onClick={copyToClipboard}
-        className="copy-button"
+        className="absolute top-2 right-2 bg-slate-700 dark:bg-slate-600 text-slate-300 dark:text-slate-200 border-none px-2 py-1 rounded text-xs cursor-pointer transition-colors duration-200 hover:bg-slate-600 dark:hover:bg-slate-500"
         size="sm"
         variant="ghost"
       >
