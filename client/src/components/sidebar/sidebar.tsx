@@ -3,8 +3,6 @@ import { Plus } from "lucide-react";
 import { DatabaseConnections } from "./database-connections";
 import { QueryHistory } from "./query-history";
 import { Pipelines } from "./pipelines";
-import promptEltLogo from "@assets/image_1753195611158.png";
-
 interface SidebarProps {
   isOpen: boolean;
   onToggle: () => void;
@@ -15,12 +13,7 @@ export function Sidebar({ isOpen }: SidebarProps) {
     <div className={`w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col ${isOpen ? 'block' : 'hidden lg:flex'}`}>
       {/* Sidebar Header */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex items-center space-x-2">
-          {/* PromptELT Logo */}
-          <img src={promptEltLogo} alt="PromptELT" className="w-8 h-8" />
-          <span className="font-semibold text-gray-900 dark:text-white">PromptELT</span>
-        </div>
-        <Button className="w-full mt-3 bg-promptelt-500 text-white rounded-lg px-3 py-2 text-sm font-medium hover:bg-promptelt-600 transition-colors flex items-center justify-center space-x-2">
+        <Button className="w-full bg-promptelt-500 text-white rounded-lg px-3 py-2 text-sm font-medium hover:bg-promptelt-600 transition-colors flex items-center justify-center space-x-2">
           <Plus size={16} />
           <span>New Pipeline Chat</span>
         </Button>
