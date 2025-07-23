@@ -153,7 +153,6 @@ export function ChatInterface({ onSidebarToggle, isWebSocketConnected, theme, on
             <Menu size={20} className="text-gray-700 dark:text-gray-200" />
           </Button>
           <div className="flex items-center space-x-3">
-            <img src={promptEltLogo} alt="PromptELT" className="w-8 h-8" />
             <ModelSelector selectedModel={selectedModel} onModelChange={setSelectedModel} />
           </div>
           {isWebSocketConnected && (
