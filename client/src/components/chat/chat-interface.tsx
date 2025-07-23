@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Menu, Send, Paperclip, Sun, Moon } from "lucide-react";
+import { Menu, Send, Paperclip, Sun, Moon, Upload, Mic, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageBubble } from "./message-bubble";
 import { DatabaseChip } from "@/components/database/database-chip";
 import { DatabaseIcon } from "@/lib/database-icons";
+import { ModelSelector } from "@/components/ui/model-selector";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import promptEltLogo from "@assets/image_1753195611158.png";
@@ -19,11 +20,38 @@ interface ChatInterfaceProps {
   onThemeToggle: () => void;
 }
 
+interface ConnectionStatusProps {
+  status: "online" | "offline" | "warning";
+  size?: "sm" | "md";
+}
+
+function ConnectionStatus({ status, size = "sm" }: ConnectionStatusProps) {
+  const getStatusColor = () => {
+    switch (status) {
+      case "online":
+        return "bg-green-500";
+      case "offline":
+        return "bg-red-500";
+      case "warning":
+        return "bg-orange-500";
+      default:
+        return "bg-gray-400";
+    }
+  };
+
+  const dotSize = size === "sm" ? "w-2 h-2" : "w-3 h-3";
+
+  return (
+    <div className={`${dotSize} rounded-full ${getStatusColor()}`} />
+  );
+}
+
 export function ChatInterface({ onSidebarToggle, isWebSocketConnected, theme, onThemeToggle }: ChatInterfaceProps) {
   const [message, setMessage] = useState("");
   const [selectedDatabases, setSelectedDatabases] = useState<number[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [messages, setMessages] = useState<Array<Message & { aiResponse?: any }>>([]);
+  const [selectedModel, setSelectedModel] = useState("claude-sonnet");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
 
@@ -124,9 +152,9 @@ export function ChatInterface({ onSidebarToggle, isWebSocketConnected, theme, on
           >
             <Menu size={20} className="text-gray-700 dark:text-gray-200" />
           </Button>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3">
             <img src={promptEltLogo} alt="PromptELT" className="w-8 h-8" />
-            <h1 className="text-lg font-semibold text-gray-900 dark:text-white">PromptELT</h1>
+            <ModelSelector selectedModel={selectedModel} onModelChange={setSelectedModel} />
           </div>
           {isWebSocketConnected && (
             <div className="flex items-center space-x-2 text-sm text-green-600 dark:text-green-400">
@@ -191,13 +219,16 @@ export function ChatInterface({ onSidebarToggle, isWebSocketConnected, theme, on
                 {databases.map((db) => (
                   <div
                     key={db.id}
-                    className={`w-12 h-12 rounded-lg flex items-center justify-center cursor-pointer hover:scale-110 transition-transform ${
+                    className={`relative w-12 h-12 rounded-lg flex items-center justify-center cursor-pointer hover:scale-110 transition-transform ${
                       db.status === "online" ? "opacity-100" : "opacity-50"
                     } ${selectedDatabases.includes(db.id) ? "ring-2 ring-blue-500" : ""}`}
-                    title={db.name}
+                    title={`${db.name} - ${db.status}`}
                     onClick={() => toggleDatabase(db.id)}
                   >
                     <DatabaseIcon type={db.type} size="lg" />
+                    <div className="absolute -bottom-1 -right-1">
+                      <ConnectionStatus status={db.status as "online" | "offline" | "warning"} size="md" />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -239,15 +270,25 @@ export function ChatInterface({ onSidebarToggle, isWebSocketConnected, theme, on
             
             {/* Input Actions */}
             <div className="absolute bottom-3 right-3 flex items-center space-x-2">
-              <Button variant="ghost" size="sm" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
-                <Paperclip size={20} />
+              <Button variant="ghost" size="sm" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600" title="Upload file">
+                <Upload size={18} />
+              </Button>
+              <Button variant="ghost" size="sm" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600" title="Voice input">
+                <Mic size={18} />
+              </Button>
+              <Button variant="ghost" size="sm" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600" title="Attach file">
+                <Paperclip size={18} />
+              </Button>
+              <Button variant="ghost" size="sm" className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600" title="Tools">
+                <Settings size={18} />
               </Button>
               <Button 
                 onClick={handleSend}
                 disabled={!message.trim() || isProcessing}
                 className="p-2 bg-promptelt-500 text-white rounded-lg hover:bg-promptelt-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Send message"
               >
-                <Send size={20} />
+                <Send size={18} />
               </Button>
             </div>
           </div>
@@ -255,7 +296,7 @@ export function ChatInterface({ onSidebarToggle, isWebSocketConnected, theme, on
           {/* Input Footer */}
           <div className="flex items-center justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
             <div className="flex items-center space-x-4">
-              <span>PromptELT Sonnet 4</span>
+              <span>{selectedModel.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
               <span>•</span>
               <span>Connected: {connectedCount}/{databases.length} databases</span>
               {selectedDatabases.length > 0 && (

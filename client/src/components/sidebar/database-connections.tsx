@@ -47,15 +47,18 @@ export function DatabaseConnections() {
               <div className="text-sm font-medium text-gray-900 dark:text-white">{database.name}</div>
               <div className="text-xs text-gray-500 dark:text-gray-400">{database.type}</div>
             </div>
-            <div
-              className={`w-2 h-2 rounded-full status-dot ${
-                database.status === "online"
-                  ? "online"
-                  : database.status === "offline"
-                  ? "offline"
-                  : "warning"
-              }`}
-            />
+            <div className="flex items-center space-x-2">
+              <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">{database.status}</span>
+              <div
+                className={`w-2 h-2 rounded-full ${
+                  database.status === "online"
+                    ? "bg-green-500"
+                    : database.status === "offline"
+                    ? "bg-red-500"
+                    : "bg-orange-500"
+                }`}
+              />
+            </div>
           </div>
         ))}
       </div>
