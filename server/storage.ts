@@ -95,10 +95,10 @@ export class MemStorage implements IStorage {
 
     const sqlServerDb: Database = {
       id: this.currentId++,
-      name: "mssql-dev",
+      name: "mssql-server",
       type: "sqlserver",
       connectionString: "sqlserver://dev-server:1433/database",
-      status: "offline",
+      status: "online",
       userId: demoUser.id,
       createdAt: new Date()
     };
@@ -173,6 +173,55 @@ export class MemStorage implements IStorage {
       updatedAt: new Date()
     };
     this.pipelines.set(salesDataPipeline.id, salesDataPipeline);
+
+    // Additional pipelines
+    const snowflakeDatabricksMigration: Pipeline = {
+      id: this.currentId++,
+      name: "Snowflake Databricks Migration",
+      description: "Migrate warehouse data to Databricks",
+      status: "running",
+      schedule: "0 2 * * *",
+      sourceDbId: snowflakeDb.id,
+      targetDbId: databricksDb.id,
+      configuration: { type: "ETL", migration: "full_warehouse" },
+      userId: demoUser.id,
+      parentPipelineId: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.pipelines.set(snowflakeDatabricksMigration.id, snowflakeDatabricksMigration);
+
+    const sqlServerChurnAnalysis: Pipeline = {
+      id: this.currentId++,
+      name: "SQL Server Churn Analysis Pipeline",
+      description: "Customer churn analysis from SQL Server to Databricks",
+      status: "active",
+      schedule: "0 3 * * 1",
+      sourceDbId: sqlServerDb.id,
+      targetDbId: databricksDb.id,
+      configuration: { type: "ETL", analysis: "customer_churn" },
+      userId: demoUser.id,
+      parentPipelineId: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.pipelines.set(sqlServerChurnAnalysis.id, sqlServerChurnAnalysis);
+
+    const realTimeDataSync: Pipeline = {
+      id: this.currentId++,
+      name: "Real-time Data Sync",
+      description: "Live data synchronization pipeline",
+      status: "active",
+      schedule: "*/15 * * * *",
+      sourceDbId: salesforceDb.id,
+      targetDbId: snowflakeDb.id,
+      configuration: { type: "ELT", sync: "real_time" },
+      userId: demoUser.id,
+      parentPipelineId: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.pipelines.set(realTimeDataSync.id, realTimeDataSync);
   }
 
   async getUser(id: number): Promise<User | undefined> {
