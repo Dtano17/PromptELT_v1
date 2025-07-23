@@ -1,7 +1,7 @@
 import snowflakeIcon from "@assets/snowflake_icon_1753195843639.png";
 import databricksIcon from "@assets/databricks_icon_1753195858518.png";
-import sqlServerIcon from "@assets/image_1753277616301.png";
-import salesforceIcon from "@assets/image_1753195993314.png";
+import sqlServerIcon from "@assets/image_1753195993314.png";
+import salesforceIcon from "@assets/image_1753277616301.png";
 
 interface DatabaseIconProps {
   type: string;
