@@ -1,6 +1,4 @@
-import { useTheme } from "@/hooks/use-theme";
-import promptEltLightLogo from "@assets/promptELT_light_background_logo_1753297754370.png";
-import promptEltDarkLogo from "@assets/promptELT_dark_background_logo_1753297754368.png";
+import promptEltLogo from "@assets/generated-image_1753298328578.png";
 
 interface LogoProps {
   size?: "sm" | "md" | "lg" | "xl";
@@ -8,8 +6,6 @@ interface LogoProps {
 }
 
 export function Logo({ size = "md", className = "" }: LogoProps) {
-  const { theme } = useTheme();
-  
   const getSizeClasses = () => {
     switch (size) {
       case "sm": return "h-6 w-auto";
@@ -20,15 +16,12 @@ export function Logo({ size = "md", className = "" }: LogoProps) {
     }
   };
 
-  // Use light logo for dark theme (light logo on dark webapp background)
-  // Use dark logo for light theme (dark logo on light webapp background)
-  const logoSrc = theme === "dark" ? promptEltLightLogo : promptEltDarkLogo;
-
   return (
     <img 
-      src={logoSrc} 
+      src={promptEltLogo} 
       alt="PromptELT" 
-      className={`${getSizeClasses()} ${className}`}
+      className={`${getSizeClasses()} ${className} object-contain`}
+      style={{ backgroundColor: 'transparent' }}
     />
   );
 }
