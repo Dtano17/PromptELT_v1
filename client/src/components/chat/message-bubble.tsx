@@ -20,8 +20,8 @@ export function MessageBubble({ message }: MessageBubbleProps) {
 
   return (
     <div className="flex justify-start message-fade-in">
-      <div className="max-w-3xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm">
-        <p className="text-gray-800 dark:text-gray-200 mb-4">{message.content}</p>
+      <div className="max-w-3xl bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-2xl p-6 shadow-md">
+        <p className="text-gray-900 dark:text-gray-100 mb-4">{message.content}</p>
         
         {aiResponse?.sql && (
           <div className="mb-6">

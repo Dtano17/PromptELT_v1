@@ -5,7 +5,7 @@ import { useWebSocket } from "@/hooks/use-websocket";
 import { useTheme } from "@/hooks/use-theme";
 
 export default function Home() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const { isConnected } = useWebSocket();
   const { theme, toggleTheme } = useTheme();
 

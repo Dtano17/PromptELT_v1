@@ -9,7 +9,7 @@ import { DatabaseIcon } from "@/lib/database-icons";
 import { ModelSelector } from "@/components/ui/model-selector";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import promptEltLogo from "@assets/image_1753195611158.png";
+import { Logo } from "@/components/ui/logo";
 import type { Database, Message } from "@shared/schema";
 import type { Theme } from "@/hooks/use-theme";
 
@@ -183,7 +183,7 @@ export function ChatInterface({ onSidebarToggle, isWebSocketConnected, theme, on
               <div className="mb-4">
                 {/* PromptELT Logo */}
                 <div className="inline-flex items-center space-x-3 mb-4">
-                  <img src={promptEltLogo} alt="PromptELT" className="w-32 h-auto" />
+                  <Logo size="xl" />
                 </div>
               </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Ready to communicate with your databases?</h2>
