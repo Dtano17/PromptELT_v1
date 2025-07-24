@@ -39,22 +39,23 @@ export interface PipelineStep {
 }
 
 export class ClaudeService {
-  private anthropic: Anthropic;
-
-  constructor() {
-    this.anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
-    });
+  private getAnthropicClient(apiKey?: string): Anthropic {
+    const key = apiKey || process.env.ANTHROPIC_API_KEY;
+    if (!key) {
+      throw new Error('No Anthropic API key provided');
+    }
+    return new Anthropic({ apiKey: key });
   }
 
-  async processNaturalLanguageQuery(request: ProcessQueryRequest): Promise<ProcessQueryResponse> {
+  async processNaturalLanguageQuery(request: ProcessQueryRequest, apiKey?: string): Promise<ProcessQueryResponse> {
     const { query, databaseIds, schema, context } = request;
 
     const systemPrompt = this.buildSystemPrompt(schema, context);
     const userPrompt = this.buildUserPrompt(query, databaseIds);
 
     try {
-      const response = await this.anthropic.messages.create({
+      const anthropic = this.getAnthropicClient(apiKey);
+      const response = await anthropic.messages.create({
         model: DEFAULT_MODEL_STR,
         max_tokens: 4000,
         system: systemPrompt,
@@ -83,7 +84,8 @@ export class ClaudeService {
     source: string,
     target: string,
     requirements: string,
-    schema?: SchemaInfo[]
+    schema?: SchemaInfo[],
+    apiKey?: string
   ): Promise<ProcessQueryResponse> {
     const systemPrompt = `You are an expert ETL/ELT pipeline architect. Create comprehensive data pipeline specifications with:
 1. Step-by-step transformation logic
@@ -104,7 +106,8 @@ Please provide:
 4. Estimated timeline and dependencies`;
 
     try {
-      const response = await this.anthropic.messages.create({
+      const anthropic = this.getAnthropicClient(apiKey);
+      const response = await anthropic.messages.create({
         model: DEFAULT_MODEL_STR,
         max_tokens: 6000,
         system: systemPrompt,
@@ -232,7 +235,7 @@ Please analyze this query and provide the appropriate SQL solution with explanat
     return steps;
   }
 
-  async validateQuery(sql: string, schema?: SchemaInfo[]): Promise<{ isValid: boolean; errors: string[]; suggestions: string[] }> {
+  async validateQuery(sql: string, schema?: SchemaInfo[], apiKey?: string): Promise<{ isValid: boolean; errors: string[]; suggestions: string[] }> {
     const prompt = `Validate this SQL query for syntax, logic, and best practices:
 
 ${sql}
@@ -242,7 +245,8 @@ ${schema ? `Schema context: ${JSON.stringify(schema, null, 2)}` : ''}
 Respond with JSON containing: isValid (boolean), errors (array), suggestions (array)`;
 
     try {
-      const response = await this.anthropic.messages.create({
+      const anthropic = this.getAnthropicClient(apiKey);
+      const response = await anthropic.messages.create({
         model: DEFAULT_MODEL_STR,
         max_tokens: 2000,
         messages: [

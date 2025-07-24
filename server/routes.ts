@@ -160,7 +160,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Process natural language query using MCP
   app.post("/api/process-query", async (req, res) => {
     try {
-      const { query, databaseIds, context } = req.body;
+      const { query, databaseIds, context, apiKey } = req.body;
       
       if (!query || !databaseIds || databaseIds.length === 0) {
         return res.status(400).json({ error: "Query and database IDs are required" });
@@ -170,7 +170,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         query,
         databaseIds,
         context
-      });
+      }, apiKey);
 
       if (mcpResponse.success) {
         res.json(mcpResponse.data);
@@ -237,6 +237,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(stats);
     } catch (error: any) {
       res.status(500).json({ error: `Failed to get stats: ${error.message}` });
+    }
+  });
+
+  // Test Claude API key
+  app.post("/api/test-claude", async (req, res) => {
+    try {
+      const { apiKey } = req.body;
+      
+      if (!apiKey || !apiKey.startsWith("sk-ant-")) {
+        return res.status(400).json({ error: "Invalid API key format" });
+      }
+
+      // Test the API key with a simple request
+      const Anthropic = (await import('@anthropic-ai/sdk')).default;
+      const anthropic = new Anthropic({ apiKey });
+
+      const testResponse = await anthropic.messages.create({
+        model: "claude-3-5-sonnet-20241022",
+        max_tokens: 50,
+        messages: [{ role: 'user', content: 'Hello, just testing the API key. Please respond with "API key is valid".' }],
+      });
+
+      res.json({ 
+        success: true, 
+        message: "API key is valid and working",
+        response: testResponse.content[0] 
+      });
+    } catch (error: any) {
+      console.error('Claude API test failed:', error);
+      
+      if (error.status === 401) {
+        res.status(401).json({ error: "Invalid API key" });
+      } else if (error.status === 403) {
+        res.status(403).json({ error: "API key doesn't have required permissions" });
+      } else {
+        res.status(500).json({ error: "Failed to test API key: " + error.message });
+      }
     }
   });
 

@@ -61,7 +61,9 @@ export function ChatInterface({ onSidebarToggle, isWebSocketConnected, theme, on
 
   const processMutation = useMutation({
     mutationFn: async (data: { query: string; databaseIds: number[] }) => {
-      const response = await apiRequest("POST", "/api/process-query", data);
+      // Get API key from localStorage
+      const apiKey = localStorage.getItem("anthropic_api_key");
+      const response = await apiRequest("POST", "/api/process-query", { ...data, apiKey });
       return response.json();
     },
     onSuccess: (aiResponse) => {

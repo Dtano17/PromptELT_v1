@@ -123,7 +123,7 @@ export class MCPBroker {
     }
   }
 
-  async processNaturalLanguageQuery(request: ProcessQueryRequest): Promise<MCPResponse> {
+  async processNaturalLanguageQuery(request: ProcessQueryRequest, apiKey?: string): Promise<MCPResponse> {
     const startTime = Date.now();
 
     try {
@@ -140,7 +140,7 @@ export class MCPBroker {
       const response = await this.claudeService.processNaturalLanguageQuery({
         ...request,
         schema: schemas
-      });
+      }, apiKey);
 
       const executionTime = Date.now() - startTime;
 

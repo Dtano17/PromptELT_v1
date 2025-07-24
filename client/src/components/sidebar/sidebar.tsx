@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { Plus, ChevronLeft, Search, Library, History, X } from "lucide-react";
+import { Plus, ChevronLeft, Search, Library, History, X, Settings } from "lucide-react";
 import { DatabaseConnections } from "./database-connections";
 import { QueryHistory } from "./query-history";
 import { Pipelines } from "./pipelines";
 import { Logo } from "@/components/ui/logo";
+import { Link } from "wouter";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -132,10 +133,33 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
       {/* Sidebar Footer */}
       {isOpen && (
         <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+          <Link href="/settings">
+            <Button
+              variant="ghost"
+              className="w-full justify-start mb-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+            >
+              <Settings size={16} className="mr-2" />
+              Settings
+            </Button>
+          </Link>
           <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
             <span>Free plan</span>
             <button className="text-promptelt-600 hover:text-promptelt-700 dark:text-promptelt-400 dark:hover:text-promptelt-300">Upgrade</button>
           </div>
+        </div>
+      )}
+
+      {/* Collapsed Settings Button */}
+      {!isOpen && (
+        <div className="p-2">
+          <Link href="/settings">
+            <button
+              className="w-full p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
+              title="Settings"
+            >
+              <Settings size={18} className="text-gray-600 dark:text-gray-400" />
+            </button>
+          </Link>
         </div>
       )}
     </div>
