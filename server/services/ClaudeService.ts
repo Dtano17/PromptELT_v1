@@ -27,6 +27,7 @@ export interface ProcessQueryResponse {
   confidence: number;
   suggestions?: string[];
   pipelineSteps?: PipelineStep[];
+  connectionHelp?: string;
 }
 
 export interface PipelineStep {
@@ -133,18 +134,27 @@ Please provide:
   }
 
   private buildSystemPrompt(schema?: SchemaInfo[], context?: string): string {
-    let prompt = `You are an expert database analyst and SQL specialist. Your role is to:
-1. Understand natural language queries about data
-2. Generate accurate SQL statements
-3. Explain your reasoning clearly
-4. Suggest optimizations and best practices
-5. Identify potential data quality issues
+    let prompt = `You are a helpful database assistant. When users ask questions about databases or data, provide practical, actionable answers.
 
-Always respond in JSON format with these fields:
-- explanation: Clear explanation of what you understood and how you approached it
-- sql: The SQL query (if applicable)
-- confidence: Number 0-100 indicating your confidence in the solution
-- suggestions: Array of helpful suggestions or alternatives`;
+FOR CONNECTION QUESTIONS (like "how do I connect to Snowflake"):
+- Provide step-by-step connection instructions
+- Include specific connection parameters needed
+- Mention authentication methods
+- Give example connection strings
+- Suggest troubleshooting steps
+
+FOR DATA QUESTIONS:
+- Generate SQL queries when appropriate
+- Explain what the query does
+- Show expected results format
+- Suggest optimizations
+
+Always respond in JSON format with:
+- explanation: Helpful, actionable answer that directly addresses the user's question
+- sql: SQL query if the question involves data retrieval
+- confidence: Number 0-100 indicating confidence
+- suggestions: Practical next steps or alternatives
+- connectionHelp: For connection questions, provide specific setup instructions`;
 
     if (schema && schema.length > 0) {
       prompt += `\n\nAvailable database schema:\n${JSON.stringify(schema, null, 2)}`;
@@ -158,11 +168,30 @@ Always respond in JSON format with these fields:
   }
 
   private buildUserPrompt(query: string, databaseIds: number[]): string {
-    return `Natural language query: "${query}"
+    const isConnectionQuery = query.toLowerCase().includes('connect') || 
+                             query.toLowerCase().includes('connection') ||
+                             query.toLowerCase().includes('how do i');
+    
+    if (isConnectionQuery) {
+      return `Connection question: "${query}"
+      
+Target databases (IDs): ${databaseIds.join(', ')}
+
+This user needs help with database connectivity. Provide specific, step-by-step instructions including:
+1. Required connection parameters (host, port, username, password, database, warehouse, etc.)
+2. Example connection strings or configuration
+3. Authentication methods available
+4. Common troubleshooting steps
+5. Best practices for secure connections
+
+Be practical and actionable in your response.`;
+    }
+    
+    return `Data query: "${query}"
     
 Target databases (IDs): ${databaseIds.join(', ')}
 
-Please analyze this query and provide the appropriate SQL solution with explanation.`;
+Generate appropriate SQL statements and provide clear explanations of what the query does and what results to expect.`;
   }
 
   private parseClaudeResponse(responseText: string): ProcessQueryResponse {
@@ -176,7 +205,8 @@ Please analyze this query and provide the appropriate SQL solution with explanat
           sql: parsed.sql,
           confidence: parsed.confidence || 75,
           suggestions: parsed.suggestions || [],
-          results: parsed.results
+          results: parsed.results,
+          connectionHelp: parsed.connectionHelp
         };
       }
     } catch (error) {

@@ -23,6 +23,17 @@ export function MessageBubble({ message }: MessageBubbleProps) {
       <div className="max-w-3xl bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-2xl p-6 shadow-md">
         <p className="text-gray-900 dark:text-gray-100 mb-4">{message.content}</p>
         
+        {aiResponse?.connectionHelp && (
+          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2 flex items-center">
+              🔗 Connection Instructions
+            </h4>
+            <div className="text-sm text-blue-700 dark:text-blue-300 whitespace-pre-line">
+              {aiResponse.connectionHelp}
+            </div>
+          </div>
+        )}
+        
         {aiResponse?.sql && (
           <div className="mb-6">
             <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Generated Query:</h4>

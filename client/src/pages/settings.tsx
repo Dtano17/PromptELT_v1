@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, Save, Key } from "lucide-react";
+import { Eye, EyeOff, Save, Key, ArrowLeft } from "lucide-react";
+import { Link } from "wouter";
 
 export default function Settings() {
   const [apiKey, setApiKey] = useState("");
@@ -90,6 +91,14 @@ export default function Settings() {
   return (
     <div className="container mx-auto p-6 max-w-2xl">
       <div className="mb-6">
+        <div className="flex items-center gap-4 mb-4">
+          <Link href="/">
+            <Button variant="ghost" size="sm" className="flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Back to Chat
+            </Button>
+          </Link>
+        </div>
         <h1 className="text-3xl font-bold">Settings</h1>
         <p className="text-muted-foreground mt-2">
           Configure your API keys and application preferences
