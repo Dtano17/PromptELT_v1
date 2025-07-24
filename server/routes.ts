@@ -4,12 +4,16 @@ import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { z } from "zod";
 import { insertMessageSchema, insertConversationSchema, insertPipelineSchema } from "@shared/schema";
+import { MCPBroker } from "./services/MCPBroker.js";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
 
   // Demo user ID for development
   const DEMO_USER_ID = 1;
+  
+  // Initialize MCP Broker
+  const mcpBroker = new MCPBroker();
 
   // API Routes
   
@@ -153,8 +157,91 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Simulate AI query processing
+  // Process natural language query using MCP
   app.post("/api/process-query", async (req, res) => {
+    try {
+      const { query, databaseIds, context } = req.body;
+      
+      if (!query || !databaseIds || databaseIds.length === 0) {
+        return res.status(400).json({ error: "Query and database IDs are required" });
+      }
+
+      const mcpResponse = await mcpBroker.processNaturalLanguageQuery({
+        query,
+        databaseIds,
+        context
+      });
+
+      if (mcpResponse.success) {
+        res.json(mcpResponse.data);
+      } else {
+        res.status(500).json({ error: mcpResponse.error });
+      }
+    } catch (error: any) {
+      res.status(500).json({ error: `Query processing failed: ${error.message}` });
+    }
+  });
+
+  // Test database connection
+  app.post("/api/databases/:id/test", async (req, res) => {
+    try {
+      const databaseId = parseInt(req.params.id);
+      const databases = await storage.getDatabasesByUserId(DEMO_USER_ID);
+      const database = databases.find(db => db.id === databaseId);
+      
+      if (!database) {
+        return res.status(404).json({ error: "Database not found" });
+      }
+
+      const mcpResponse = await mcpBroker.connectDatabase(database);
+      res.json(mcpResponse);
+    } catch (error: any) {
+      res.status(500).json({ error: `Connection test failed: ${error.message}` });
+    }
+  });
+
+  // Execute SQL query
+  app.post("/api/databases/:id/query", async (req, res) => {
+    try {
+      const databaseId = parseInt(req.params.id);
+      const { query, parameters = [] } = req.body;
+      
+      if (!query) {
+        return res.status(400).json({ error: "SQL query is required" });
+      }
+
+      const mcpResponse = await mcpBroker.executeQuery(databaseId, query, parameters);
+      res.json(mcpResponse);
+    } catch (error: any) {
+      res.status(500).json({ error: `Query execution failed: ${error.message}` });
+    }
+  });
+
+  // Get database schema
+  app.get("/api/databases/:id/schema", async (req, res) => {
+    try {
+      const databaseId = parseInt(req.params.id);
+      const includeData = req.query.includeData === 'true';
+
+      const mcpResponse = await mcpBroker.getSchema(databaseId, includeData);
+      res.json(mcpResponse);
+    } catch (error: any) {
+      res.status(500).json({ error: `Schema retrieval failed: ${error.message}` });
+    }
+  });
+
+  // Get MCP service statistics
+  app.get("/api/mcp/stats", async (req, res) => {
+    try {
+      const stats = await mcpBroker.getServiceStats();
+      res.json(stats);
+    } catch (error: any) {
+      res.status(500).json({ error: `Failed to get stats: ${error.message}` });
+    }
+  });
+
+  // Original mock response fallback (keeping for backward compatibility)
+  app.post("/api/process-query-mock", async (req, res) => {
     try {
       const { query, databaseIds } = req.body;
       

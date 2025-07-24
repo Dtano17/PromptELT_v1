@@ -38,11 +38,21 @@ The application follows a monorepo structure with clearly separated client, serv
 - **Form Handling**: React Hook Form with Zod validation
 - **UI Framework**: Modern component-driven architecture with TypeScript
 
+### Backend Services
+- **MCPBroker**: Manages MCP server communications and database connections
+- **ClaudeService**: Handles AI-powered natural language query processing with Claude 4.0 Sonnet
+- **SchemaSnapshotService**: Tracks database schema changes and maintains version history
+- **QueryCache**: Intelligent caching layer with TTL and LRU eviction strategies
+
 ### Backend Architecture
 - **API Layer**: RESTful Express.js server with TypeScript
 - **Database Layer**: Drizzle ORM for type-safe database operations
 - **Real-time Features**: WebSocket server for live updates
 - **Data Storage**: In-memory storage implementation with interface for future database integration
+- **MCP Integration**: Model Context Protocol for database communications
+- **AI Services**: Claude AI integration for natural language query processing
+- **Caching Layer**: Query result caching with TTL and LRU eviction
+- **Schema Management**: Automated schema snapshot and change tracking
 
 ### Database Schema
 The application uses a well-structured PostgreSQL schema with the following core entities:
@@ -83,6 +93,8 @@ The application uses a well-structured PostgreSQL schema with the following core
 - **@radix-ui/***: Headless UI component primitives
 - **wouter**: Lightweight routing for React
 - **date-fns**: Date manipulation utilities
+- **@anthropic-ai/sdk**: Claude AI integration for natural language processing
+- **@modelcontextprotocol/sdk**: MCP server protocol for database communication
 
 ### Development Tools
 - **Vite**: Fast development server and build tool

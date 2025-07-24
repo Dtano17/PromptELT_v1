@@ -1,7 +1,4 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { z } from "zod";
-import { DatabaseConfig } from "../types/database.js";
+import { DatabaseConfig, QueryResult, SchemaInfo } from "../types/database.js";
 
 export class MCPBroker {
   private servers: Map<string, McpServer> = new Map();
