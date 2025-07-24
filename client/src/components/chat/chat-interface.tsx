@@ -121,8 +121,7 @@ export function ChatInterface({ onSidebarToggle, isWebSocketConnected, theme, on
     setShowAutocomplete(true);
     updateAutocompletePosition();
     
-    // Debug output (remove after testing)
-    console.log('Autocomplete triggered:', { afterAt, showAutocomplete: true });
+
   };
 
   const updateAutocompletePosition = () => {
@@ -185,6 +184,11 @@ export function ChatInterface({ onSidebarToggle, isWebSocketConnected, theme, on
       if (e.key === 'Escape') {
         e.preventDefault();
         setShowAutocomplete(false);
+        return;
+      }
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        // Tab will be handled by the autocomplete component
         return;
       }
       // Let the autocomplete component handle arrow keys and enter

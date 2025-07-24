@@ -21,9 +21,12 @@ export function DatabaseAutocomplete({
   const listRef = useRef<HTMLDivElement>(null);
 
   const filteredDatabases = databases.filter(db => {
-    const search = searchTerm.toLowerCase();
+    const search = searchTerm.toLowerCase().trim();
     const name = db.name.toLowerCase();
     const type = db.type.toLowerCase();
+    
+    // If no search term, show all
+    if (!search) return true;
     
     // Exact name match
     if (name.includes(search)) return true;
@@ -34,12 +37,19 @@ export function DatabaseAutocomplete({
     // Shorthand matches for common databases
     if (search === 'sn' && type === 'snowflake') return true;
     if (search === 'sa' && type === 'salesforce') return true;
-    if (search === 'ms' && type === 'mssql') return true;
+    if (search === 'ms' && (type === 'mssql' || type === 'sqlserver')) return true;
     if (search === 'db' && type === 'databricks') return true;
     
-    // Starting letters match (e.g., "snow" matches "snowflake-prod")
-    if (name.startsWith(search)) return true;
+    // Partial type matches (e.g., "snow" matches "snowflake")
     if (type.startsWith(search)) return true;
+    if (name.startsWith(search)) return true;
+    
+    // Fuzzy matching for common typos
+    if (search === 'snowf' && type === 'snowflake') return true;
+    if (search === 'snowfl' && type === 'snowflake') return true;
+    if (search === 'snowfla' && type === 'snowflake') return true;
+    if (search === 'snowflak' && type === 'snowflake') return true;
+    if (search === 'snoflake' && type === 'snowflake') return true; // common typo
     
     return false;
   });
@@ -66,6 +76,7 @@ export function DatabaseAutocomplete({
           );
           break;
         case 'Enter':
+        case 'Tab':
           e.preventDefault();
           if (filteredDatabases[selectedIndex]) {
             onSelect(filteredDatabases[selectedIndex]);
@@ -78,8 +89,7 @@ export function DatabaseAutocomplete({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isVisible, selectedIndex, filteredDatabases, onSelect]);
 
-  // Debug output (remove after testing)
-  console.log('Autocomplete render:', { isVisible, filteredCount: filteredDatabases.length, searchTerm });
+
 
   if (!isVisible || filteredDatabases.length === 0) {
     return null;
@@ -98,9 +108,9 @@ export function DatabaseAutocomplete({
       {filteredDatabases.map((database, index) => (
         <div
           key={database.id}
-          className={`flex items-center gap-3 px-3 py-2 cursor-pointer ${
+          className={`flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors ${
             index === selectedIndex 
-              ? 'bg-blue-50 dark:bg-blue-900/20' 
+              ? 'bg-blue-100 dark:bg-blue-900/30 border-l-2 border-blue-500' 
               : 'hover:bg-gray-50 dark:hover:bg-gray-700'
           }`}
           onClick={() => onSelect(database)}
@@ -111,7 +121,7 @@ export function DatabaseAutocomplete({
               @{database.name}
             </span>
             <span className="text-xs text-gray-500 dark:text-gray-400">
-              {database.type} • Available shortcuts: @{database.type.slice(0,2)}
+              {database.type} • Try: @{database.type === 'snowflake' ? 'sn' : database.type === 'salesforce' ? 'sa' : database.type === 'databricks' ? 'db' : database.type === 'sqlserver' ? 'ms' : database.type.slice(0,2)}
             </span>
           </div>
         </div>
