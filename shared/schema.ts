@@ -11,6 +11,7 @@ export const users = pgTable("users", {
 export const databases = pgTable("databases", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
+  alias: text("alias"), // User-friendly alias for @mentions
   type: text("type").notNull(), // 'snowflake', 'databricks', 'sqlserver', 'salesforce'
   connectionString: text("connection_string").notNull(),
   status: text("status").notNull().default("offline"), // 'online', 'offline', 'warning'
@@ -66,6 +67,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
 
 export const insertDatabaseSchema = createInsertSchema(databases).pick({
   name: true,
+  alias: true,
   type: true,
   connectionString: true,
   userId: true,

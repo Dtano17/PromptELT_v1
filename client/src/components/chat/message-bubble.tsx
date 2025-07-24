@@ -31,7 +31,18 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             <div className="text-sm text-blue-700 dark:text-blue-300 whitespace-pre-line leading-relaxed">
               {typeof aiResponse.connectionHelp === 'string' 
                 ? aiResponse.connectionHelp 
-                : JSON.stringify(aiResponse.connectionHelp, null, 2)}
+                : (
+                  <div className="space-y-4">
+                    {Object.entries(aiResponse.connectionHelp).map(([key, value]) => (
+                      <div key={key} className="border-l-2 border-blue-300 pl-3">
+                        <div className="font-medium text-blue-800 dark:text-blue-200 mb-1">{key}:</div>
+                        <div className="text-blue-600 dark:text-blue-300">
+                          {typeof value === 'object' ? JSON.stringify(value, null, 2) : value}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
             </div>
           </div>
         )}

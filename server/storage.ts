@@ -16,6 +16,7 @@ export interface IStorage {
   getDatabasesByUserId(userId: number): Promise<Database[]>;
   createDatabase(database: InsertDatabase): Promise<Database>;
   updateDatabaseStatus(id: number, status: string): Promise<Database | undefined>;
+  updateDatabase(id: number, updates: { alias?: string }): Promise<Database | undefined>;
 
   // Conversations
   getConversation(id: number): Promise<Conversation | undefined>;
@@ -74,6 +75,7 @@ export class MemStorage implements IStorage {
     const snowflakeDb: Database = {
       id: this.currentId++,
       name: "snowflake-prod",
+      alias: "snow-prod",
       type: "snowflake",
       connectionString: "snowflake://prod.account.snowflakecomputing.com",
       status: "online",
@@ -85,6 +87,7 @@ export class MemStorage implements IStorage {
     const databricksDb: Database = {
       id: this.currentId++,
       name: "databricks",
+      alias: "databricks-main",
       type: "databricks",
       connectionString: "databricks://workspace.cloud.databricks.com",
       status: "online",
@@ -96,6 +99,7 @@ export class MemStorage implements IStorage {
     const sqlServerDb: Database = {
       id: this.currentId++,
       name: "mssql-server",
+      alias: "sql-dev",
       type: "sqlserver",
       connectionString: "sqlserver://dev-server:1433/database",
       status: "online",
@@ -107,6 +111,7 @@ export class MemStorage implements IStorage {
     const salesforceDb: Database = {
       id: this.currentId++,
       name: "salesforce-crm",
+      alias: "sf-crm",
       type: "salesforce",
       connectionString: "salesforce://na1.salesforce.com",
       status: "online",
@@ -257,6 +262,18 @@ export class MemStorage implements IStorage {
     };
     this.databases.set(id, database);
     return database;
+  }
+
+  async updateDatabase(id: number, updates: { alias?: string }): Promise<Database | undefined> {
+    const database = this.databases.get(id);
+    if (database) {
+      if (updates.alias !== undefined) {
+        database.alias = updates.alias;
+      }
+      this.databases.set(id, database);
+      return database;
+    }
+    return undefined;
   }
 
   async updateDatabaseStatus(id: number, status: string): Promise<Database | undefined> {

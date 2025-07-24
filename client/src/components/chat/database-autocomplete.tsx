@@ -28,8 +28,9 @@ export function DatabaseAutocomplete({
     // If no search term, show all
     if (!search) return true;
     
-    // Exact name match
+    // Exact name or alias match
     if (name.includes(search)) return true;
+    if (db.alias && db.alias.toLowerCase().includes(search)) return true;
     
     // Type match  
     if (type.includes(search)) return true;
@@ -43,6 +44,7 @@ export function DatabaseAutocomplete({
     // Partial type matches (e.g., "snow" matches "snowflake")
     if (type.startsWith(search)) return true;
     if (name.startsWith(search)) return true;
+    if (db.alias && db.alias.toLowerCase().startsWith(search)) return true;
     
     // Fuzzy matching for common typos
     if (search === 'snowf' && type === 'snowflake') return true;
@@ -118,10 +120,10 @@ export function DatabaseAutocomplete({
           <DatabaseIcon type={database.type} size="sm" />
           <div className="flex flex-col">
             <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              @{database.name}
+              @{database.alias || database.name}
             </span>
             <span className="text-xs text-gray-500 dark:text-gray-400">
-              {database.type} • Try: @{database.type === 'snowflake' ? 'sn' : database.type === 'salesforce' ? 'sa' : database.type === 'databricks' ? 'db' : database.type === 'sqlserver' ? 'ms' : database.type.slice(0,2)}
+              {database.type} • {database.alias ? `Alias: ${database.alias}` : `Try: @${database.type === 'snowflake' ? 'sn' : database.type === 'salesforce' ? 'sa' : database.type === 'databricks' ? 'db' : database.type === 'sqlserver' ? 'ms' : database.type.slice(0,2)}`}
             </span>
           </div>
         </div>

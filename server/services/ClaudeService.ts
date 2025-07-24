@@ -162,7 +162,7 @@ Always respond in JSON format with:
 - sql: SQL query if data retrieval is needed
 - confidence: Number 0-100 indicating confidence
 - suggestions: Next steps, follow-up questions, or related topics to explore
-- connectionHelp: Step-by-step connection guide with examples and where to find each detail
+- connectionHelp: Plain text step-by-step connection guide, NOT JSON format
 - followUpQuestions: Array of specific questions to help the user with next steps`;
 
     if (schema && schema.length > 0) {
@@ -196,7 +196,9 @@ This user wants to connect to their database through the PromptELT platform. Be 
 6. Offer different authentication methods
 7. Give troubleshooting tips for common issues
 
-Make it feel like you're sitting next to them helping them connect. Use friendly language and ask clarifying questions.`;
+Make it feel like you're sitting next to them helping them connect. Use friendly language and ask clarifying questions.
+
+IMPORTANT: For connectionHelp field, provide plain text instructions, NOT JSON. Write it as if you're talking to them directly.`;
     }
     
     return `Data query: "${query}"

@@ -377,5 +377,23 @@ LIMIT 100;`,
     });
   });
 
+  // Update database alias
+  app.patch("/api/databases/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { alias } = req.body;
+
+      const database = await storage.updateDatabase(id, { alias });
+      if (!database) {
+        return res.status(404).json({ error: "Database not found" });
+      }
+
+      res.json(database);
+    } catch (error) {
+      console.error("Error updating database:", error);
+      res.status(500).json({ error: "Failed to update database" });
+    }
+  });
+
   return httpServer;
 }
