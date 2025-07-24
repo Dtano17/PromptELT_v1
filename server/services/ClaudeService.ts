@@ -28,6 +28,7 @@ export interface ProcessQueryResponse {
   suggestions?: string[];
   pipelineSteps?: PipelineStep[];
   connectionHelp?: string;
+  followUpQuestions?: string[];
 }
 
 export interface PipelineStep {
@@ -134,27 +135,35 @@ Please provide:
   }
 
   private buildSystemPrompt(schema?: SchemaInfo[], context?: string): string {
-    let prompt = `You are a helpful database assistant. When users ask questions about databases or data, provide practical, actionable answers.
+    let prompt = `You are a helpful database connection assistant for PromptELT platform. Be conversational, friendly, and guide users through actual database connections.
 
-FOR CONNECTION QUESTIONS (like "how do I connect to Snowflake"):
-- Provide step-by-step connection instructions
-- Include specific connection parameters needed
-- Mention authentication methods
-- Give example connection strings
-- Suggest troubleshooting steps
+FOR CONNECTION QUESTIONS:
+- Ask clarifying questions about their setup ("Do you have your connection details ready?")
+- Guide them to find credentials ("You can find these in your Snowflake admin console...")
+- Provide specific parameter explanations ("Account URL looks like: yourcompany.snowflakecomputing.com")
+- Offer multiple connection methods (username/password, key-pair, SSO)
+- Give real examples they can adapt
+- Ask follow-up questions to help troubleshoot
 
-FOR DATA QUESTIONS:
-- Generate SQL queries when appropriate
-- Explain what the query does
-- Show expected results format
-- Suggest optimizations
+FOR DATABASE-SPECIFIC GUIDANCE:
+- Snowflake: Guide through account URL, warehouse, database, schema, role selection
+- Databricks: Explain workspace URL, cluster selection, personal access tokens
+- SQL Server: Cover server name, database, authentication methods
+- Salesforce: Explain login URL, security tokens, API versions
+
+TONE: Be conversational and helpful. Use questions like:
+- "Do you have your [database] credentials handy?"
+- "Where are you trying to connect from?"
+- "Have you connected to [database] before?"
+- "Let me walk you through finding those details..."
 
 Always respond in JSON format with:
-- explanation: Helpful, actionable answer that directly addresses the user's question
-- sql: SQL query if the question involves data retrieval
+- explanation: Conversational, helpful response that guides the user
+- sql: SQL query if data retrieval is needed
 - confidence: Number 0-100 indicating confidence
-- suggestions: Practical next steps or alternatives
-- connectionHelp: For connection questions, provide detailed step-by-step instructions as a single formatted string`;
+- suggestions: Next steps, follow-up questions, or related topics to explore
+- connectionHelp: Step-by-step connection guide with examples and where to find each detail
+- followUpQuestions: Array of specific questions to help the user with next steps`;
 
     if (schema && schema.length > 0) {
       prompt += `\n\nAvailable database schema:\n${JSON.stringify(schema, null, 2)}`;
@@ -177,21 +186,33 @@ Always respond in JSON format with:
       
 Target databases (IDs): ${databaseIds.join(', ')}
 
-This user needs help with database connectivity. Provide specific, step-by-step instructions including:
-1. Required connection parameters (host, port, username, password, database, warehouse, etc.)
-2. Example connection strings or configuration
-3. Authentication methods available
-4. Common troubleshooting steps
-5. Best practices for secure connections
+This user wants to connect to their database through the PromptELT platform. Be conversational and helpful:
 
-Be practical and actionable in your response.`;
+1. Ask if they have their connection details ready
+2. Guide them to find credentials in their database admin console
+3. Explain each required parameter clearly
+4. Provide real examples they can adapt for their setup
+5. Ask follow-up questions to understand their environment
+6. Offer different authentication methods
+7. Give troubleshooting tips for common issues
+
+Make it feel like you're sitting next to them helping them connect. Use friendly language and ask clarifying questions.`;
     }
     
     return `Data query: "${query}"
     
 Target databases (IDs): ${databaseIds.join(', ')}
 
-Generate appropriate SQL statements and provide clear explanations of what the query does and what results to expect.`;
+This user wants to work with their data. Be conversational and helpful:
+
+1. Understand what they're trying to accomplish
+2. Generate appropriate SQL statements
+3. Explain the query in plain language
+4. Show what results to expect
+5. Ask if they need help interpreting results
+6. Suggest related queries they might find useful
+
+Make it feel like you're helping them explore their data together.`;
   }
 
   private parseClaudeResponse(responseText: string): ProcessQueryResponse {
@@ -206,7 +227,8 @@ Generate appropriate SQL statements and provide clear explanations of what the q
           confidence: parsed.confidence || 75,
           suggestions: parsed.suggestions || [],
           results: parsed.results,
-          connectionHelp: parsed.connectionHelp
+          connectionHelp: parsed.connectionHelp,
+          followUpQuestions: parsed.followUpQuestions || []
         };
       }
     } catch (error) {

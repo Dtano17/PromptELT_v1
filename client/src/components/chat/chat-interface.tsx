@@ -219,6 +219,17 @@ export function ChatInterface({ onSidebarToggle, isWebSocketConnected, theme, on
     }
   }, [message]);
 
+  useEffect(() => {
+    const handleAddToInput = (event: CustomEvent) => {
+      setMessage(event.detail);
+      setShowAutocomplete(false);
+      textareaRef.current?.focus();
+    };
+
+    document.addEventListener('addToInput', handleAddToInput as EventListener);
+    return () => document.removeEventListener('addToInput', handleAddToInput as EventListener);
+  }, []);
+
   return (
     <>
       {/* Header */}

@@ -24,11 +24,11 @@ export function MessageBubble({ message }: MessageBubbleProps) {
         <p className="text-gray-900 dark:text-gray-100 mb-4">{message.content}</p>
         
         {aiResponse?.connectionHelp && (
-          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-            <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2 flex items-center">
-              🔗 Connection Instructions
+          <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-3 flex items-center">
+              🔗 Connection Guide
             </h4>
-            <div className="text-sm text-blue-700 dark:text-blue-300 whitespace-pre-line">
+            <div className="text-sm text-blue-700 dark:text-blue-300 whitespace-pre-line leading-relaxed">
               {typeof aiResponse.connectionHelp === 'string' 
                 ? aiResponse.connectionHelp 
                 : JSON.stringify(aiResponse.connectionHelp, null, 2)}
@@ -81,6 +81,29 @@ export function MessageBubble({ message }: MessageBubbleProps) {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+        {aiResponse?.followUpQuestions && aiResponse.followUpQuestions.length > 0 && (
+          <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
+            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center">
+              💭 What would you like to know next?
+            </h4>
+            <div className="space-y-2">
+              {aiResponse.followUpQuestions.map((question: string, index: number) => (
+                <button 
+                  key={index}
+                  className="block w-full text-left text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 p-2 rounded transition-colors"
+                  onClick={() => {
+                    // Add the question to the input
+                    const event = new CustomEvent('addToInput', { detail: question });
+                    document.dispatchEvent(event);
+                  }}
+                >
+                  → {question}
+                </button>
+              ))}
             </div>
           </div>
         )}
