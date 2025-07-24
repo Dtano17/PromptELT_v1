@@ -98,34 +98,39 @@ export function ChatInterface({ onSidebarToggle, isWebSocketConnected, theme, on
   const handleMessageChange = (value: string) => {
     setMessage(value);
     
-    // Check for @ symbol and show autocomplete
-    const atIndex = value.lastIndexOf('@');
-    if (atIndex !== -1 && atIndex === value.length - 1) {
-      // @ is at the end, show all databases
-      setAutocompleteSearchTerm("");
-      setShowAutocomplete(true);
-      updateAutocompletePosition();
-    } else if (atIndex !== -1) {
-      // @ exists with text after it
-      const searchTerm = value.substring(atIndex + 1);
-      if (!searchTerm.includes(' ')) {
-        // Still typing database name
-        setAutocompleteSearchTerm(searchTerm);
-        setShowAutocomplete(true);
-        updateAutocompletePosition();
-      } else {
-        setShowAutocomplete(false);
-      }
-    } else {
+    // Find the last @ symbol and check if we should show autocomplete
+    const lastAtIndex = value.lastIndexOf('@');
+    
+    if (lastAtIndex === -1) {
+      // No @ symbol found
       setShowAutocomplete(false);
+      return;
     }
+    
+    // Get text after the last @
+    const afterAt = value.substring(lastAtIndex + 1);
+    
+    // Check if there's a space after @, which means we've finished typing the database name
+    if (afterAt.includes(' ')) {
+      setShowAutocomplete(false);
+      return;
+    }
+    
+    // Show autocomplete and filter by the text after @
+    setAutocompleteSearchTerm(afterAt);
+    setShowAutocomplete(true);
+    updateAutocompletePosition();
+    
+    // Debug output (remove after testing)
+    console.log('Autocomplete triggered:', { afterAt, showAutocomplete: true });
   };
 
   const updateAutocompletePosition = () => {
     if (textareaRef.current) {
       const rect = textareaRef.current.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       setAutocompletePosition({
-        top: rect.bottom + 4,
+        top: rect.bottom + scrollTop + 4,
         left: rect.left
       });
     }
@@ -175,6 +180,17 @@ export function ChatInterface({ onSidebarToggle, isWebSocketConnected, theme, on
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    // If autocomplete is showing, handle navigation
+    if (showAutocomplete) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setShowAutocomplete(false);
+        return;
+      }
+      // Let the autocomplete component handle arrow keys and enter
+      return;
+    }
+    
     if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
       e.preventDefault();
       handleSend();

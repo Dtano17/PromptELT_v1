@@ -20,10 +20,29 @@ export function DatabaseAutocomplete({
   const [selectedIndex, setSelectedIndex] = useState(0);
   const listRef = useRef<HTMLDivElement>(null);
 
-  const filteredDatabases = databases.filter(db => 
-    db.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    db.type.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredDatabases = databases.filter(db => {
+    const search = searchTerm.toLowerCase();
+    const name = db.name.toLowerCase();
+    const type = db.type.toLowerCase();
+    
+    // Exact name match
+    if (name.includes(search)) return true;
+    
+    // Type match  
+    if (type.includes(search)) return true;
+    
+    // Shorthand matches for common databases
+    if (search === 'sn' && type === 'snowflake') return true;
+    if (search === 'sa' && type === 'salesforce') return true;
+    if (search === 'ms' && type === 'mssql') return true;
+    if (search === 'db' && type === 'databricks') return true;
+    
+    // Starting letters match (e.g., "snow" matches "snowflake-prod")
+    if (name.startsWith(search)) return true;
+    if (type.startsWith(search)) return true;
+    
+    return false;
+  });
 
   useEffect(() => {
     setSelectedIndex(0);
@@ -59,6 +78,9 @@ export function DatabaseAutocomplete({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isVisible, selectedIndex, filteredDatabases, onSelect]);
 
+  // Debug output (remove after testing)
+  console.log('Autocomplete render:', { isVisible, filteredCount: filteredDatabases.length, searchTerm });
+
   if (!isVisible || filteredDatabases.length === 0) {
     return null;
   }
@@ -66,11 +88,11 @@ export function DatabaseAutocomplete({
   return (
     <div 
       ref={listRef}
-      className="absolute z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-48 overflow-y-auto"
+      className="fixed z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-48 overflow-y-auto"
       style={{ 
         top: position.top, 
         left: position.left,
-        minWidth: '200px'
+        minWidth: '250px'
       }}
     >
       {filteredDatabases.map((database, index) => (
@@ -86,10 +108,10 @@ export function DatabaseAutocomplete({
           <DatabaseIcon type={database.type} size="sm" />
           <div className="flex flex-col">
             <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              {database.name}
+              @{database.name}
             </span>
             <span className="text-xs text-gray-500 dark:text-gray-400">
-              {database.type}
+              {database.type} • Available shortcuts: @{database.type.slice(0,2)}
             </span>
           </div>
         </div>
