@@ -154,7 +154,7 @@ Always respond in JSON format with:
 - sql: SQL query if the question involves data retrieval
 - confidence: Number 0-100 indicating confidence
 - suggestions: Practical next steps or alternatives
-- connectionHelp: For connection questions, provide specific setup instructions`;
+- connectionHelp: For connection questions, provide detailed step-by-step instructions as a single formatted string`;
 
     if (schema && schema.length > 0) {
       prompt += `\n\nAvailable database schema:\n${JSON.stringify(schema, null, 2)}`;

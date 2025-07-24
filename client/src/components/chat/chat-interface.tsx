@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageBubble } from "./message-bubble";
 import { DatabaseChip } from "@/components/database/database-chip";
+import { DatabaseAutocomplete } from "./database-autocomplete";
 import { DatabaseIcon } from "@/lib/database-icons";
 import { ModelSelector } from "@/components/ui/model-selector";
 import { apiRequest } from "@/lib/queryClient";
@@ -52,6 +53,9 @@ export function ChatInterface({ onSidebarToggle, isWebSocketConnected, theme, on
   const [isProcessing, setIsProcessing] = useState(false);
   const [messages, setMessages] = useState<Array<Message & { aiResponse?: any }>>([]);
   const [selectedModel, setSelectedModel] = useState("claude-sonnet");
+  const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const [autocompletePosition, setAutocompletePosition] = useState({ top: 0, left: 0 });
+  const [autocompleteSearchTerm, setAutocompleteSearchTerm] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
 
@@ -90,6 +94,59 @@ export function ChatInterface({ onSidebarToggle, isWebSocketConnected, theme, on
     },
   });
 
+  // Handle @ autocomplete
+  const handleMessageChange = (value: string) => {
+    setMessage(value);
+    
+    // Check for @ symbol and show autocomplete
+    const atIndex = value.lastIndexOf('@');
+    if (atIndex !== -1 && atIndex === value.length - 1) {
+      // @ is at the end, show all databases
+      setAutocompleteSearchTerm("");
+      setShowAutocomplete(true);
+      updateAutocompletePosition();
+    } else if (atIndex !== -1) {
+      // @ exists with text after it
+      const searchTerm = value.substring(atIndex + 1);
+      if (!searchTerm.includes(' ')) {
+        // Still typing database name
+        setAutocompleteSearchTerm(searchTerm);
+        setShowAutocomplete(true);
+        updateAutocompletePosition();
+      } else {
+        setShowAutocomplete(false);
+      }
+    } else {
+      setShowAutocomplete(false);
+    }
+  };
+
+  const updateAutocompletePosition = () => {
+    if (textareaRef.current) {
+      const rect = textareaRef.current.getBoundingClientRect();
+      setAutocompletePosition({
+        top: rect.bottom + 4,
+        left: rect.left
+      });
+    }
+  };
+
+  const handleDatabaseSelect = (database: Database) => {
+    const atIndex = message.lastIndexOf('@');
+    const beforeAt = message.substring(0, atIndex);
+    const newMessage = `${beforeAt}@${database.name} `;
+    setMessage(newMessage);
+    setShowAutocomplete(false);
+    
+    // Add to selected databases if not already selected
+    if (!selectedDatabases.includes(database.id)) {
+      setSelectedDatabases(prev => [...prev, database.id]);
+    }
+    
+    // Focus back to textarea
+    textareaRef.current?.focus();
+  };
+
   const handleSend = async () => {
     if (!message.trim() || isProcessing) return;
 
@@ -108,6 +165,7 @@ export function ChatInterface({ onSidebarToggle, isWebSocketConnected, theme, on
     
     const currentMessage = message;
     setMessage("");
+    setShowAutocomplete(false);
 
     // Process with AI
     processMutation.mutate({
@@ -258,15 +316,24 @@ export function ChatInterface({ onSidebarToggle, isWebSocketConnected, theme, on
             <Textarea
               ref={textareaRef}
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={(e) => handleMessageChange(e.target.value)}
               onKeyDown={handleKeyDown}
               className="w-full resize-none border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-2xl px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-promptelt-500 focus:border-transparent placeholder-gray-500 dark:placeholder-gray-400"
               placeholder={selectedDatabases.length > 0 
-                ? `Ask ${databases.filter(db => selectedDatabases.includes(db.id)).map(db => `@${db.name}`).join(', ')} about your data...`
-                : "Ask about your databases or describe an ETL pipeline..."
+                ? `Ask ${databases.filter(db => selectedDatabases.includes(db.id)).map(db => `@${db.name}`).join(', ')} about your data... (Type @ to mention databases)`
+                : "Ask about your databases or describe an ETL pipeline... (Type @ to mention databases)"
               }
               rows={3}
               disabled={isProcessing}
+            />
+            
+            {/* Database Autocomplete */}
+            <DatabaseAutocomplete
+              databases={databases}
+              onSelect={handleDatabaseSelect}
+              isVisible={showAutocomplete}
+              position={autocompletePosition}
+              searchTerm={autocompleteSearchTerm}
             />
             
             {/* Input Actions */}

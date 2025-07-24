@@ -29,7 +29,9 @@ export function MessageBubble({ message }: MessageBubbleProps) {
               🔗 Connection Instructions
             </h4>
             <div className="text-sm text-blue-700 dark:text-blue-300 whitespace-pre-line">
-              {aiResponse.connectionHelp}
+              {typeof aiResponse.connectionHelp === 'string' 
+                ? aiResponse.connectionHelp 
+                : JSON.stringify(aiResponse.connectionHelp, null, 2)}
             </div>
           </div>
         )}
